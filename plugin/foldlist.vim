@@ -1,7 +1,7 @@
 " File: foldlist.vim
 " Author: Paul C. Wei
-" Version: l.0.3
-" Last Modified: 11/26/2002
+" Version: l.0.4
+" Last Modified: 11/28/2002
 "
 " Overview
 " --------
@@ -13,7 +13,7 @@
 "    goto the fold.
 " 2. Moving through the fold list with the j, k, l, h, moves to the
 "    associated fold in the file.
-" 3. <CR> jumps to associated fold in file.(search: __T9)
+" 3. <CR> jumps to associated fold in file.
 "
 " Installation
 " ------------
@@ -22,7 +22,7 @@
 "    more details about Vim plugins.
 " 2. Restart Vim.
 " 3. You can use the ":Flist" command to open the foldlist window. 
-" 4. Handle up to 9 levels of folds
+" 4. Handle up to 9 levels of folds. (search for '__T9' to change)
 "
 " Usage
 " -----
@@ -35,12 +35,19 @@
 " You can close the taglist window from the taglist window by pressing 'q' or
 " using the Vim ":q" command. 
 "
-" Send comments/suggestions/fixes are welcome (send to pwei@san.rr.com)
-
+" Send comments/suggestions/fixes to pwei@san.rr.com.
+"
+" Caveats:
+" ---------
+" 1. Fold is searched using fold title only. This may find other places in file
+"    with the same string. I currently just hit 'l' or 'h' till find the
+"    correct fold. Will fix by adding a tag if it becomes sufficiently annoying.
+"
 " Wish List
 " ---------
-" 1. Make fold list hierarchical.
-" 2. Make compatible w/ hi-note on palm.
+" 1. Make fold list hierarchical & folding.
+" 2. Make compatible w/ hi-note on palm (prob through ext conversion prog).
+" 3. Allow for changes in fold hierarchy in fold list reflect in file
 "
 " Example:
 " --------
@@ -155,9 +162,10 @@ function! s:Flist(win)
 	silent! exe "norm zm 1G"
 
 	" set interface for fold window
-	exe winnumt . 'wincmd w'
+    nnoremap <buffer> <silent> <CR> :call <SID>Flist_Jump_To_List()<CR>
 
-	"exe 'set fdm=indent'
+	" set interface for list window
+	exe winnumt . 'wincmd w'
 
 	" setup keyboard mapping
     nnoremap <buffer> <silent> q :bdelete<CR>
@@ -194,6 +202,15 @@ function! s:Flist(win)
         highlight link FoldListTitle Title
     endif
 
+endfunction
+
+"======================================================================
+" Flist_Jump_To_List()
+function! s:Flist_Jump_To_List()
+    let bname = '__Fold__'
+    let winnumt = bufwinnr(bname)
+	" return to fold list
+	exe winnumt.'wincmd w'
 endfunction
 
 "======================================================================
@@ -275,3 +292,6 @@ endfunction
 " Define the 'Flist' user commands to open/close taglist
 " window
 command! -nargs=0 Flist call s:Flist(bufnr('%'))
+
+"For my own editing of utility
+"map [g :e c:\0setup\vim61\plugin\foldlist.vim<cr>
