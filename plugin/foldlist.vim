@@ -1,7 +1,7 @@
 " File: foldlist.vim
 " Author: Paul C. Wei
-" Version: l.0.4
-" Last Modified: 11/28/2002
+" Version: l.0.5
+" Last Modified: 12/7/2004
 "
 " Overview
 " --------
@@ -67,6 +67,10 @@
 "  Work
 "  Shop
 "
+" Change Log:
+" 1.05 Change to use tab between levels of folds in fold list.
+"      Fix to work with C commented folds
+"
 " ****************** Do not modify after this line ************************
 
 if exists('loaded_foldlist') || &cp
@@ -131,26 +135,26 @@ function! s:Flist(win)
 	let scanline  = 0
 	let prevline = -1
 	while scanline != prevline
-		if (foldlevel(scanline)>0 && scanline != prevline)
-            let ln = getline(scanline)
-            let ln = substitute(ln,"^[ \t]*","","")
-            let ln = substitute(ln,"{{{","","")
-            let ln = substitute(ln,"[ \t]*$","","")
-            let ln = "__T".foldlevel(scanline).ln
-            let ln = substitute(ln,"^__T1","","")
-            let ln = substitute(ln,"^__T2"," ","")
-            let ln = substitute(ln,"^__T3","  ","")
-            let ln = substitute(ln,"^__T4","   ","")
-            let ln = substitute(ln,"^__T5","    ","")
-            let ln = substitute(ln,"^__T6","     ","")
-            let ln = substitute(ln,"^__T6","      ","")
-            let ln = substitute(ln,"^__T7","       ","")
-            let ln = substitute(ln,"^__T8","        ","")
-            let ln = substitute(ln,"^__T9","         ","")
-			exe winnumt . 'wincmd w'
-			exe append(line('$'),ln)
-			exe winnum . 'wincmd w'
-		endif
+	    if (foldlevel(scanline)>0 && scanline != prevline)
+	      let ln = getline(scanline)
+	      let ln = substitute(ln,"^[ \t]*","","")
+	      let ln = substitute(ln,"{{{.*","","")
+	      let ln = substitute(ln,"[ \t]*$","","")
+	      let ln = "__T".foldlevel(scanline).ln
+	      let ln = substitute(ln,"^__T1","\t","")
+	      let ln = substitute(ln,"^__T2","\t\t","")
+	      let ln = substitute(ln,"^__T3","\t\t\t","")
+	      let ln = substitute(ln,"^__T4","\t\t\t\t","")
+	      let ln = substitute(ln,"^__T5","\t\t\t\t\t","")
+	      let ln = substitute(ln,"^__T6","\t\t\t\t\t\t","")
+	      let ln = substitute(ln,"^__T6","\t\t\t\t\t\t\t","")
+	      let ln = substitute(ln,"^__T7","\t\t\t\t\t\t\t\t","")
+	      let ln = substitute(ln,"^__T8","\t\t\t\t\t\t\t\t\t","")
+	      let ln = substitute(ln,"^__T9","\t\t\t\t\t\t\t\t\t\t","")
+	      exe winnumt . 'wincmd w'
+	      exe append(line('$'),ln)
+	      exe winnum . 'wincmd w'
+	    endif
 		" open all levels of current fold, goto next fold
 		silent! exe "norm zOzj"
 		let prevline = scanline
@@ -166,6 +170,7 @@ function! s:Flist(win)
 
 	" set interface for list window
 	exe winnumt . 'wincmd w'
+	exe "set ts=1"
 
 	" setup keyboard mapping
     nnoremap <buffer> <silent> q :bdelete<CR>
